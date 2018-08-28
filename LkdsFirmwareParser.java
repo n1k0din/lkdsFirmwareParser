@@ -11,6 +11,8 @@ public class LkdsFirmwareParser{
 		Ждём файл вида:
 		- блабла1
 		- блабла2
+		     миниблабла1
+			 миниблабла2
 		...
 		- блаблаN
 		
@@ -45,7 +47,7 @@ public class LkdsFirmwareParser{
 		s = s.substring(i);		
 		s = "<li>" + s + "</li>" + "\r\n";
 		fw.write(s);
-		System.out.println(s = scan.nextLine());//
+		System.out.println(s = scan.nextLine());//а тут прочитали и бросили s, которая начинается не с пробелов
 		}		
 		fw.write("</ul>\r\n");
 		subS = s.substring(0,2);
