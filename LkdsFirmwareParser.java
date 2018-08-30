@@ -3,168 +3,153 @@ import java.util.ArrayList;
 
 public class LkdsFirmwareParser{
 	
-	private String input;
-	private String output;
-	private ArrayList<String> list;//СЃРїРёСЃРѕРє СЃС‚СЂРѕРє
-	private FileWorker fileWorker;//РѕР±СЉРµРєС‚ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„Р°Р№Р»Р°РјРё	
-	private ArrayList<Pair> indexList; //СЃРїРёСЃРѕРє РїР°СЂ РёРЅРґРµРєСЃРѕРІ РІС‚РѕСЂРѕРіРѕ СѓСЂРѕРІРЅСЏ	
-	private boolean[] flagArray; //СЃРїРёСЃРѕРє С„Р»Р°РіРѕРІ РїРµСЂРІС‹Р№ СѓСЂРѕРІРµРЅСЊ РёР»Рё РІС‚РѕСЂРѕР№ СѓСЂРѕРІРµРЅСЊ
+	private String input;//файл входящий
+	private String output;//файл исходящий
+	private ArrayList<String> list;//список строк из входящего файла
+	private FileWorker fileWorker;//объект для работы с файлами	
+		
+	private FileWorker fwNameList; //это для списка исполнений, на потом
+	private ArrayList<String> nameList; //список исполнений из файла исполнений, на потом
 	
+	
+	final private ArrayList<Firmware> firmwares = new ArrayList<Firmware>(); //список прошивок
+	//где прошивка = наименование исполнения + список изменений, где изменений это 
+	//
+		
 	public LkdsFirmwareParser(String input, String output) {
 	
 		this.input = input;
 		this.output = output;		
 		list = new ArrayList<String>();
-		indexList = new ArrayList<Pair>();
+		nameList = new ArrayList<String>();
+		
+		
 	}
 	
 	public void openAndReadInputFile() throws Exception {
 		
 		fileWorker = new FileWorker(input, output);
-		list = fileWorker.readFiletoArrayList();	
+		list = fileWorker.readFiletoArrayList();
+		fwNameList = new FileWorker("list.txt", "error.txt");
+		nameList = fwNameList.readFiletoArrayList();
+		
 		
 	}
+	
+		
+	
 	
 	public void writeOutputfile() throws Exception {
 	
 		fileWorker.writeFileFromArrayList(list);		
-	}
+	}	
 	
-	public void printList() {
-		
-		for( String s : list) System.out.println(s);
-		
-	}
+	public void stringsToFirmwares() {
 	
-	public void printIndexList() {
-		
-		for( Pair p : indexList) {
-		
-			System.out.println(p.getI() + ", " + p.getJ());
-			
-		}
-		
-	}
-	
-	public void createFlagArray() {
-	
-		flagArray = new boolean[list.size()];
-		
-		for(int i = 0; i < list.size(); i++) {
-			String subS = list.get(i).substring(0,2);//Р±РµСЂС‘Рј РїРµСЂРІС‹Рµ РґРІР° СЃРёРјРІРѕР»РѕРІ
-			if(subS.equals("- ")) flagArray[i] = true;//РґРµС„РёСЃ-РїСЂРѕР±РµР» РїРµСЂРІС‹Р№ СѓСЂРѕРІРµРЅСЊ
-				else if(subS.equals("  ")) flagArray[i] = false;//РґРІР° РїСЂРѕР±РµР»Р° РІС‚РѕСЂРѕР№ СѓСЂРѕРІРµРЅСЊ
-		
-		}			
-	}
-	
-	public void createIndexList() {
-		
-		indexList.add(new Pair(0,list.size()-1));//РїРѕР»РѕР¶РёР»Рё РїР°СЂСѓ (0,n) - С‚РёРїР° РЅР°РґРѕ Р·Р°РєР»СЋС‡РёС‚СЊ РІ С‚РµРіРё Р±Р»РѕРє СЃ 0 РїРѕ n СЃС‚СЂРѕРєСѓ
-		
-		for(int i = 0; i < list.size(); i++) {//РЅР°С‡РёРЅР°РµРј-С‚Рѕ РїР°Р»СЋР±СЌ СЃ РїРµСЂРІРѕРіРѕ СѓСЂРѕРІРЅСЏ
-		
-			int j = 0;
-			if (flagArray[i] == false) { //РёС‰РµРј РїРµСЂРІСѓСЋ РІСЃС‚СЂРµС‡Сѓ РІС‚РѕСЂРѕРіРѕ
-				for(j = i; j < list.size() && flagArray[j] == false; j++);//;!!! Рё СЃС‡РёС‚Р°РµРј РєРѕР»РёС‡РµСЃС‚РІРѕ
-				indexList.add(new Pair(i,j-1)); //РґРѕР±Р°РІР»СЏРµРј РїР°СЂСѓ РІ РЅР°С€ СЃРїРёСЃРѕРє
-				i = j;//РїСЂРѕРґРѕР»Р¶Р°РµРј РїСЂРѕСЃРјРѕС‚СЂ СЃРїРёСЃРєР° СЃРѕ СЃР»РµРґСѓСЋС‰РµРіРѕ СЌР»РµРјРµРЅС‚Р° РїРµСЂРІРѕРіРѕ СѓСЂРѕРІРЅСЏ
-			}			
-		}		
-	
-	}
-	
-	public void clearPrefixes() {
-		//С‰Р°СЃ СЏ РІР°Рј РїРѕС‡РёСЃС‚РёСЋ 
+		//запихаем всё дерьмо сюда
+		//исходные данные:
+		//есть list со всеми исходными данными-строчкам
+		//есть nameList со списком исполнений
+		//собсно надо сгенерить ArrayList<Firmware> firmwares;
+		//если начинается не с пробела или дефиса, а заканчивается двоеточием - это firmware.name;
 		
 		for(int i = 0; i < list.size(); i++) {
 		
 			String s = list.get(i);
-		
-			if(flagArray[i]) {				
-				s = s.substring(2);//С‚СЏРї				
-			}
+			char ch0 = s.charAt(0);
+			char chN = s.charAt(s.length() - 1);
 			
-			else {
+			if(ch0 != '-' && ch0 != ' ' &&  chN == ':') {//похоже на название
+			//	
+				//System.out.println("Обнаружено исполнение на строке " + i);
+				Firmware fw = new Firmware();//создадим прошивку		
+				s = clearPrefixes(s);
+				fw.setName(s);//запишем имя исполнения
+				//теперь нужно записать список изменений
+				//причем уже без массива флагов, а наживую
+				//
+				int j = 0;
+				for(j = i+1; j < list.size() && list.get(j).charAt(0) == '-'; j++) {
+					
+					s = list.get(j);
+					ch0 = s.charAt(0);
+					//определять будем по первому символу	
+					
+					//ага, это внешний список
+					
+					Changelog changelog = new Changelog(); //создадим 
+					s = clearPrefixes(s); //подчистим
+					changelog.setOuterText(s);//положим
+					//перебираем дальше строки, начинающиеся с пробела
+					int k = 0;
+					for(k = j + 1; k < list.size() && list.get(k).charAt(0) == ' '; k++) {
+							
+						//типа пока строка начинается с пробела, пихаем её во внутр. список
+						s = list.get(k);
+						s = clearPrefixes(s);
+						changelog.addToInnerList(s);						
+					}
+						
+					//шутки кончились
+					//мы теоретически сожрали сколько-то индексов
+					j = k - 1;//проскочили их, теперь сл. строка это или исполнение или внешний список
+					//добавим теперь в прошивку ченджлог
+					fw.addChangelog(changelog);
+						
+				}
+			i = j - 1;//и тут проскочили, теперь сл. строка это исполнение скорее всего
 			
-				char[] chr = s.toCharArray();//РЅР°Р№РґРµРј РєРѕР»РёС‡РµСЃС‚РІРѕ СЌС‚РёС… РїСЂРѕР±РµР»РѕРІ
-				int j;
-				for(j = 0; j < chr.length && chr[j] == ' '; j++);//;!!!	
-				s = s.substring(j);//С‚СЏРї		
+			firmwares.add(fw);
 				
 			}
 		
-			list.set(i,s); // РїРѕР»РѕР¶ РіРґРµ РІР·СЏР»
-		
-		}	
-		
-	}
-	
-	public void addHtml() {
-	
-	addLITags();
-	addULTags();		
-	
-	}
-	
-	private void addLITags() {
-	
-		for(int i = 0; i < list.size(); i++) {
-			String s = list.get(i);
-			s = "<li>"+s+"</li>";
-			list.set(i,s);
-		}
-	
-		
-	}
-	
-	private void addULTags() {
-		for(int i = 0; i < indexList.size(); i++) {
-			
-			int startInd = indexList.get(i).getI();//РЅРµРєСЂР°СЃРёРІРѕ(
-			int stopInd = indexList.get(i).getJ();
-			
-			
-			String s = list.get(startInd);
-			s = "<ul>"+s;
-			list.set(startInd, s);
-			
-			s = list.get(stopInd);
-			s = s + "</ul>";
-			list.set(stopInd, s);
 		}
 		
 	}
 	
 	
 	
+		
+	public String clearPrefixes(String s) {
+		//щас я вам почистию 
+		String res;
+		char ch0 = s.charAt(0);
+		char chN = s.charAt(s.length() - 1);
+		
+		if(ch0 != '-' && ch0 != ' ' && chN == ':') res = s.substring(0, s.length() - 1);//подрежем двоеточие
+		
+		else if(ch0 == '-')  res = s.substring(2);//тяп дефис-пробел
+		
+		else if (ch0 == ' ') {
+			
+			char[] chr = s.toCharArray();//найдем количество этих пробелов			
+			int j;
+			for(j = 0; j < chr.length && chr[j] == ' '; j++);//;!!!	
+			res = s.substring(j);//тяп пробелы нахуй
+		}
+		else res = s;
+		
+		return res;
+	}
 	
 	
-	
-	
+	public void printFirmwareList() {
+		
+		for(Firmware fw : firmwares) fw.print();			
+		
+	}
+
 	
 	public static void main(String[] args) throws Exception{
 	
 		
 		LkdsFirmwareParser parser = new LkdsFirmwareParser("input.txt", "output.htm");
-		parser.openAndReadInputFile(); //РѕС‚РєСЂС‹РІР°РµРј Рё С‡РёС‚Р°РµРј С„Р°Р№Р» РІ AL
-		parser.createFlagArray(); //СЃРѕР·РґР°РµРј РјР°СЃСЃРёРІ С„Р»Р°РіРѕРІ РµСЃР»Рё СЃС‚СЂРѕС‡РєР° РїРµСЂРІС‹Р№ СѓСЂРѕРІРµРЅСЊ, С‚Рѕ true, РµСЃР»Рё РІС‚РѕСЂРѕР№, С‚Рѕ false
-		parser.createIndexList(); //РЅР° РѕСЃРЅРѕРІРµ РјР°СЃСЃРёРІР° С„Р»Р°РіРѕРІ РґРµР»Р°РµРј СЃРїРёСЃРѕРє РёРЅРґРµРєСЃРѕРІ
-		parser.printIndexList(); //С‡Рѕ РЅР°СЃС‡РёС‚Р°Р»Рё?
-		parser.clearPrefixes();//С‡РёСЃС‚РёРј РѕС‚ РјСѓСЃРѕСЂР° РІ РЅР°С‡Р°Р»Рµ СЃС‚СЂРѕРє
-		parser.addHtml();
-		parser.printList(); //Р° РЅСѓ Р·Р°РєРµС€
-		parser.writeOutputfile();//С‚РµРїРµСЂСЊ РІ С„Р°Р№Р»
+		parser.openAndReadInputFile(); //открываем и читаем файл в AL		
+		parser.stringsToFirmwares();		
+		parser.printFirmwareList();
+		
 		
 		
 	}
 	
 }
-
-
-	
-	
-	
-	
-	
-	
