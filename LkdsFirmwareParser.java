@@ -3,17 +3,17 @@ import java.util.ArrayList;
 
 public class LkdsFirmwareParser{
 	
-	private String input;//файл входящий
-	private String output;//файл исходящий
-	private ArrayList<String> list;//список строк из входящего файла
-	private FileWorker fileWorker;//объект для работы с файлами	
+	private String input;//С„Р°Р№Р» РІС…РѕРґСЏС‰РёР№
+	private String output;//С„Р°Р№Р» РёСЃС…РѕРґСЏС‰РёР№
+	private ArrayList<String> list;//СЃРїРёСЃРѕРє СЃС‚СЂРѕРє РёР· РІС…РѕРґСЏС‰РµРіРѕ С„Р°Р№Р»Р°
+	private FileWorker fileWorker;//РѕР±СЉРµРєС‚ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ С„Р°Р№Р»Р°РјРё	
 		
-	private FileWorker fwNameList; //это для списка исполнений, на потом
-	private ArrayList<String> nameList; //список исполнений из файла исполнений, на потом
+	private FileWorker fwNameList; //СЌС‚Рѕ РґР»СЏ СЃРїРёСЃРєР° РёСЃРїРѕР»РЅРµРЅРёР№, РЅР° РїРѕС‚РѕРј
+	private ArrayList<String> nameList; //СЃРїРёСЃРѕРє РёСЃРїРѕР»РЅРµРЅРёР№ РёР· С„Р°Р№Р»Р° РёСЃРїРѕР»РЅРµРЅРёР№, РЅР° РїРѕС‚РѕРј
 	
 	
-	final private ArrayList<Firmware> firmwares = new ArrayList<Firmware>(); //список прошивок
-	//где прошивка = наименование исполнения + список изменений, где изменений это 
+	final private ArrayList<Firmware> firmwares = new ArrayList<Firmware>(); //СЃРїРёСЃРѕРє РїСЂРѕС€РёРІРѕРє
+	//РіРґРµ РїСЂРѕС€РёРІРєР° = РЅР°РёРјРµРЅРѕРІР°РЅРёРµ РёСЃРїРѕР»РЅРµРЅРёСЏ + СЃРїРёСЃРѕРє РёР·РјРµРЅРµРЅРёР№, РіРґРµ РёР·РјРµРЅРµРЅРёР№ СЌС‚Рѕ 
 	//
 		
 	public LkdsFirmwareParser(String input, String output) {
@@ -46,12 +46,12 @@ public class LkdsFirmwareParser{
 	
 	public void stringsToFirmwares() {
 	
-		//запихаем всё дерьмо сюда
-		//исходные данные:
-		//есть list со всеми исходными данными-строчкам
-		//есть nameList со списком исполнений
-		//собсно надо сгенерить ArrayList<Firmware> firmwares;
-		//если начинается не с пробела или дефиса, а заканчивается двоеточием - это firmware.name;
+		//Р·Р°РїРёС…Р°РµРј РІСЃС‘ РґРµСЂСЊРјРѕ СЃСЋРґР°
+		//РёСЃС…РѕРґРЅС‹Рµ РґР°РЅРЅС‹Рµ:
+		//РµСЃС‚СЊ list СЃРѕ РІСЃРµРјРё РёСЃС…РѕРґРЅС‹РјРё РґР°РЅРЅС‹РјРё-СЃС‚СЂРѕС‡РєР°Рј
+		//РµСЃС‚СЊ nameList СЃРѕ СЃРїРёСЃРєРѕРј РёСЃРїРѕР»РЅРµРЅРёР№
+		//СЃРѕР±СЃРЅРѕ РЅР°РґРѕ СЃРіРµРЅРµСЂРёС‚СЊ ArrayList<Firmware> firmwares;
+		//РµСЃР»Рё РЅР°С‡РёРЅР°РµС‚СЃСЏ РЅРµ СЃ РїСЂРѕР±РµР»Р° РёР»Рё РґРµС„РёСЃР°, Р° Р·Р°РєР°РЅС‡РёРІР°РµС‚СЃСЏ РґРІРѕРµС‚РѕС‡РёРµРј - СЌС‚Рѕ firmware.name;
 		
 		for(int i = 0; i < list.size(); i++) {
 		
@@ -59,45 +59,45 @@ public class LkdsFirmwareParser{
 			char ch0 = s.charAt(0);
 			char chN = s.charAt(s.length() - 1);
 			
-			if(ch0 != '-' && ch0 != ' ' &&  chN == ':') {//похоже на название
+			if(ch0 != '-' && ch0 != ' ' &&  chN == ':') {//РїРѕС…РѕР¶Рµ РЅР° РЅР°Р·РІР°РЅРёРµ
 			//	
-				//System.out.println("Обнаружено исполнение на строке " + i);
-				Firmware fw = new Firmware();//создадим прошивку		
+				//System.out.println("РћР±РЅР°СЂСѓР¶РµРЅРѕ РёСЃРїРѕР»РЅРµРЅРёРµ РЅР° СЃС‚СЂРѕРєРµ " + i);
+				Firmware fw = new Firmware();//СЃРѕР·РґР°РґРёРј РїСЂРѕС€РёРІРєСѓ		
 				s = clearPrefixes(s);
-				fw.setName(s);//запишем имя исполнения
-				//теперь нужно записать список изменений
-				//причем уже без массива флагов, а наживую
+				fw.setName(s);//Р·Р°РїРёС€РµРј РёРјСЏ РёСЃРїРѕР»РЅРµРЅРёСЏ
+				//С‚РµРїРµСЂСЊ РЅСѓР¶РЅРѕ Р·Р°РїРёСЃР°С‚СЊ СЃРїРёСЃРѕРє РёР·РјРµРЅРµРЅРёР№
+				//РїСЂРёС‡РµРј СѓР¶Рµ Р±РµР· РјР°СЃСЃРёРІР° С„Р»Р°РіРѕРІ, Р° РЅР°Р¶РёРІСѓСЋ
 				//
 				int j = 0;
 				for(j = i+1; j < list.size() && list.get(j).charAt(0) == '-'; j++) {
 					
 					s = list.get(j);
 					ch0 = s.charAt(0);
-					//определять будем по первому символу	
+					//РѕРїСЂРµРґРµР»СЏС‚СЊ Р±СѓРґРµРј РїРѕ РїРµСЂРІРѕРјСѓ СЃРёРјРІРѕР»Сѓ	
 					
-					//ага, это внешний список
+					//Р°РіР°, СЌС‚Рѕ РІРЅРµС€РЅРёР№ СЃРїРёСЃРѕРє
 					
-					Changelog changelog = new Changelog(); //создадим 
-					s = clearPrefixes(s); //подчистим
-					changelog.setOuterText(s);//положим
-					//перебираем дальше строки, начинающиеся с пробела
+					Changelog changelog = new Changelog(); //СЃРѕР·РґР°РґРёРј 
+					s = clearPrefixes(s); //РїРѕРґС‡РёСЃС‚РёРј
+					changelog.setOuterText(s);//РїРѕР»РѕР¶РёРј
+					//РїРµСЂРµР±РёСЂР°РµРј РґР°Р»СЊС€Рµ СЃС‚СЂРѕРєРё, РЅР°С‡РёРЅР°СЋС‰РёРµСЃСЏ СЃ РїСЂРѕР±РµР»Р°
 					int k = 0;
 					for(k = j + 1; k < list.size() && list.get(k).charAt(0) == ' '; k++) {
 							
-						//типа пока строка начинается с пробела, пихаем её во внутр. список
+						//С‚РёРїР° РїРѕРєР° СЃС‚СЂРѕРєР° РЅР°С‡РёРЅР°РµС‚СЃСЏ СЃ РїСЂРѕР±РµР»Р°, РїРёС…Р°РµРј РµС‘ РІРѕ РІРЅСѓС‚СЂ. СЃРїРёСЃРѕРє
 						s = list.get(k);
 						s = clearPrefixes(s);
 						changelog.addToInnerList(s);						
 					}
 						
-					//шутки кончились
-					//мы теоретически сожрали сколько-то индексов
-					j = k - 1;//проскочили их, теперь сл. строка это или исполнение или внешний список
-					//добавим теперь в прошивку ченджлог
+					//С€СѓС‚РєРё РєРѕРЅС‡РёР»РёСЃСЊ
+					//РјС‹ С‚РµРѕСЂРµС‚РёС‡РµСЃРєРё СЃРѕР¶СЂР°Р»Рё СЃРєРѕР»СЊРєРѕ-С‚Рѕ РёРЅРґРµРєСЃРѕРІ
+					j = k - 1;//РїСЂРѕСЃРєРѕС‡РёР»Рё РёС…, С‚РµРїРµСЂСЊ СЃР». СЃС‚СЂРѕРєР° СЌС‚Рѕ РёР»Рё РёСЃРїРѕР»РЅРµРЅРёРµ РёР»Рё РІРЅРµС€РЅРёР№ СЃРїРёСЃРѕРє
+					//РґРѕР±Р°РІРёРј С‚РµРїРµСЂСЊ РІ РїСЂРѕС€РёРІРєСѓ С‡РµРЅРґР¶Р»РѕРі
 					fw.addChangelog(changelog);
 						
 				}
-			i = j - 1;//и тут проскочили, теперь сл. строка это исполнение скорее всего
+			i = j - 1;//Рё С‚СѓС‚ РїСЂРѕСЃРєРѕС‡РёР»Рё, С‚РµРїРµСЂСЊ СЃР». СЃС‚СЂРѕРєР° СЌС‚Рѕ РёСЃРїРѕР»РЅРµРЅРёРµ СЃРєРѕСЂРµРµ РІСЃРµРіРѕ
 			
 			firmwares.add(fw);
 				
@@ -111,21 +111,21 @@ public class LkdsFirmwareParser{
 	
 		
 	public String clearPrefixes(String s) {
-		//щас я вам почистию 
+		//С‰Р°СЃ СЏ РІР°Рј РїРѕС‡РёСЃС‚РёСЋ 
 		String res;
 		char ch0 = s.charAt(0);
 		char chN = s.charAt(s.length() - 1);
 		
-		if(ch0 != '-' && ch0 != ' ' && chN == ':') res = s.substring(0, s.length() - 1);//подрежем двоеточие
+		if(ch0 != '-' && ch0 != ' ' && chN == ':') res = s.substring(0, s.length() - 1);//РїРѕРґСЂРµР¶РµРј РґРІРѕРµС‚РѕС‡РёРµ
 		
-		else if(ch0 == '-')  res = s.substring(2);//тяп дефис-пробел
+		else if(ch0 == '-')  res = s.substring(2);//С‚СЏРї РґРµС„РёСЃ-РїСЂРѕР±РµР»
 		
 		else if (ch0 == ' ') {
 			
-			char[] chr = s.toCharArray();//найдем количество этих пробелов			
+			char[] chr = s.toCharArray();//РЅР°Р№РґРµРј РєРѕР»РёС‡РµСЃС‚РІРѕ СЌС‚РёС… РїСЂРѕР±РµР»РѕРІ			
 			int j;
 			for(j = 0; j < chr.length && chr[j] == ' '; j++);//;!!!	
-			res = s.substring(j);//тяп пробелы нахуй
+			res = s.substring(j);//С‚СЏРї РїСЂРѕР±РµР»С‹ РЅР°С…СѓР№
 		}
 		else res = s;
 		
@@ -144,7 +144,7 @@ public class LkdsFirmwareParser{
 	
 		
 		LkdsFirmwareParser parser = new LkdsFirmwareParser("input.txt", "output.htm");
-		parser.openAndReadInputFile(); //открываем и читаем файл в AL		
+		parser.openAndReadInputFile(); //РѕС‚РєСЂС‹РІР°РµРј Рё С‡РёС‚Р°РµРј С„Р°Р№Р» РІ AL		
 		parser.stringsToFirmwares();		
 		parser.printFirmwareList();
 		
